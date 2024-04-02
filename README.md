@@ -4,7 +4,7 @@
 
 Our paper utilizes recent vision-language models to produce diverse and realistic synthetic echocardiography image data, preserving key features of the original images guided by textual and semantic label maps. Specifically, we investigate three potential avenues: unconditional generation, generation guided by text, and a hybrid approach incorporating both textual and semantic supervision. We show that the rich contextual information present in the synthesized data potentially enhances the accuracy and interpretability of downstream tasks, such as echocardiography segmentation and classification with improved metrics and faster convergence.
 
-> [*Amirhossein Kazerouni*](https://amirhossein-kz.github.io/), [*Reza Azad*](https://rezazad68.github.io/), [*Alireza Hosseini*](https://arhosseini77.github.io/), [*Dorit Merhof*](https://scholar.google.com/citations?user=0c0rMr0AAAAJ&hl=en), [*Ulas Bagci*](https://scholar.google.com/citations?user=9LUdPM4AAAAJ&hl=en)
+> [*Pooria Ashrafian*](https://pooria90.github.io/), [*Milad Yazdani*](https://www.linkedin.com/in/milad-yazdani-932775202/?originalSubdomain=ir), [*Moein Heidari*](https://moeinheidari7829.github.io/), [*Dena Shahriari*](https://scholar.google.com/citations?user=31LfGh4AAAAJ), [*Ilker Hacihaliloglu*](https://scholar.google.com/citations?user=dA7G64kAAAAJ)
 >
 
 <br>
@@ -14,11 +14,11 @@ Our paper utilizes recent vision-language models to produce diverse and realisti
 </p>
 
 ## 💥 News 💥
-- **`--.--.--`** | Code is released!
+- **`--.--.--`** | Code will be released soon!
 - **`28.03.2024`** | The paper is now available on Arxiv.! 🥳
 
 - ## Citation
-```bibtex
+```BibTeX
 @misc{ashrafian2024visionlanguage,
       title={Vision-Language Synthetic Data Enhances Echocardiography Downstream Tasks}, 
       author={Pooria Ashrafian and Milad Yazdani and Moein Heidari and Dena Shahriari and Ilker Hacihaliloglu},
