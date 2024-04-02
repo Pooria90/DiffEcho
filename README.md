@@ -10,7 +10,7 @@ Our paper utilizes recent vision-language models to produce diverse and realisti
 <br>
 
 <p align="center">
-  <img src="https://github.com/Pooria90/DiffEcho/blob/main/Figures/method-initial.pdf" width="950">
+  <img src="https://github.com/Pooria90/DiffEcho/blob/main/Figures/method.jpg" width="950">
 </p>
 
 ## 💥 News 💥
