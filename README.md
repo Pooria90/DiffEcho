@@ -10,7 +10,7 @@ Our paper utilizes recent vision-language models to produce diverse and realisti
 <br>
 
 <p align="center">
-  <img src="https://github.com/xmindflow/INCODE/assets/61879630/3065d887-6f36-47b3-80ea-239a49a87cb4" width="950">
+  <img src="https://github.com/Pooria90/DiffEcho/blob/main/Figures/method-initial.pdf" width="950">
 </p>
 
 ## 💥 News 💥
