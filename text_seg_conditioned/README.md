@@ -1,3 +1,31 @@
-# Vision-Language Synthetic Data Enhances Echocardiography Downstream Tasks <br> <span style="float: rigth"><sub><sup></sub></sup></span>
+# Text+Segmentation Generation Task
+For this task, we relied on the great ControlNet training tutorial from HuggingFace at [here](https://huggingface.co/docs/diffusers/main/en/training/controlnet).
 
-## Text+Segmentation Generation Task
+## Training
+I added a `CustomTransform` class to the `make_train_dataset` function to apply affine trainsformations on images and segemetation masks at the same time. I used the following script in Linux to run the training.
+```bash
+#!/bin/bash
+export MODEL_DIR="./stable-diffusion-v1-5" # This the path were I saved my SD model.
+export OUTPUT_DIR="/path/for/saving/results"
+export HOME="/path/to/new/linux/home" # no need to use this variable if your home directory is writtable.
+
+accelerate launch train_controlnet.py \
+ --pretrained_model_name_or_path=$MODEL_DIR \
+ --output_dir=$OUTPUT_DIR \
+ --dataset_name="./path/to/matadata.csv" \
+ --resolution=512 \
+ --learning_rate=5e-6 \
+ --checkpointing_steps=10000 \
+ --max_train_steps=120000 \
+ --train_batch_size=1 \
+ --gradient_accumulation_steps=1 \
+ --gradient_checkpointing \
+ --use_8bit_adam
+```
+
+Our training was done on four 16GB V100 GPUs. The `gradient_checkpointing` and `use_8bit_adam` were used to reduce the required GPU memory below 16GB. The training script loads images by reading addresses and text prompts from a `metadata.csv` file.
+
+## Inference
+The `infer_controlnet.py` does the inference on a single control image (segmentation map). You need to modify the paths at the begining of the code.
+
+## Evaluation
