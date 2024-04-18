@@ -23,7 +23,7 @@ accelerate launch train_controlnet.py \
  --use_8bit_adam
 ```
 
-Our training was done on four 16GB V100 GPUs. The `gradient_checkpointing` and `use_8bit_adam` were used to reduce the required GPU memory below 16GB. The training script loads images by reading addresses and text prompts from a `metadata.csv` file.
+Our training was done on four 16GB V100 GPUs. The `gradient_checkpointing` and `use_8bit_adam` were used to reduce the required GPU memory below 16GB. The training script loads images by reading addresses and text prompts from a `metadata.csv` file. For more information on this file please refer to the `data` part of this repository.
 
 ## Inference
 The `infer_controlnet.py` does the inference on a single control image (segmentation map). You need to modify the paths at the begining of the code. The `data_generation.py` also does the same work, but reads control images from a folder. So, you can generate lots of images with it for downstream tasks or finding evaluation metrics like FID and KID.
