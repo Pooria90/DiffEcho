@@ -30,5 +30,12 @@ For training these models, the training code reads the data from a metadata.csv 
 ```bash
 python meta_data_generator.py
 ```
+The above command creates a `metadata.csv` file in the current working directory that looks like:
+|    | image                                                 | conditioning_image                                  | text                                             |
+|---:|:------------------------------------------------------|:----------------------------------------------------|:-------------------------------------------------|
+|  0 | ./train_frames/ch2_ed_frame_100.png | ./train_masks/ch2_ed_mask_100.png | an ultrasound image of heart in two-chamber view |
+|  ... |... | ... | ... |
+|  800 | ./train_frames/ch4_ed_frame_101.png | ./train_masks/ch4_ed_mask_101.png | an ultrasound image of heart in four-chamber view |
+|  ... |... | ... | ... |
 
 
