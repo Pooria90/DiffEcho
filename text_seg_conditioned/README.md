@@ -1,8 +1,8 @@
 # Text+Segmentation Generation Task
-For this task, we relied on the great ControlNet training tutorial from HuggingFace at [here](https://huggingface.co/docs/diffusers/main/en/training/controlnet).
+For this task, we relied on the great ControlNet training tutorial from HuggingFace at [here](https://huggingface.co/docs/diffusers/main/en/training/controlnet). I used Stable Diffusion v1-5 from [this link](https://huggingface.co/runwayml/stable-diffusion-v1-5/tree/main) as the base model for ControlNet. I downloaded all the content and put in a folder named `stable-diffusion-v1-5` which is used in the training script as the `MODEL_DIR`.
 
 ## Training
-I added a `CustomTransform` class to the `make_train_dataset` function to apply affine trainsformations on images and segemetation masks at the same time. I used the following script in Linux to run the training.
+I added a `CustomTransform` class to the `make_train_dataset` function to apply affine trainsformations on images and segemetation masks at the same time. I used the following script in Linux to run the training. 
 ```bash
 #!/bin/bash
 export MODEL_DIR="./stable-diffusion-v1-5" # This the path were I saved my SD model.
@@ -12,7 +12,7 @@ export HOME="/path/to/new/linux/home" # no need to use this variable if your hom
 accelerate launch train_controlnet.py \
  --pretrained_model_name_or_path=$MODEL_DIR \
  --output_dir=$OUTPUT_DIR \
- --dataset_name="./path/to/matadata.csv" \
+ --dataset_name="./path/containing/matadata.csv" \
  --resolution=512 \
  --learning_rate=5e-6 \
  --checkpointing_steps=10000 \
