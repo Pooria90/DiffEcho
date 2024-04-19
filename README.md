@@ -14,7 +14,7 @@ Our paper utilizes recent vision-language models to produce diverse and realisti
 </p>
 
 ## 💥 News 💥
-- **`--.--.--`** | Code will be released soon!
+- **`19.04.2024`** | Code is released!
 - **`28.03.2024`** | The paper is now available on Arxiv.! 🥳
 
 - ## Citation
