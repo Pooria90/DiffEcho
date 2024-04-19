@@ -66,6 +66,7 @@ class CustomTransform(object):
 
         return image, mask
 
+# a dataset to handle the real (and/or synthetic) data
 class SegDataset(Dataset):
     def __init__(self, image_dir, mask_dir, transform=None, device='cpu'):
         self.image_dir = image_dir
@@ -87,19 +88,9 @@ class SegDataset(Dataset):
 
         return image, mask
 
-
+# Input arguments
 def parse_args(input_args=None):
     parser = argparse.ArgumentParser(description="This is our segmentation script.")
-
-    '''
-    parser.add_argument(
-        "--pretrained_model_name_or_path",
-        type=str,
-        default=None,
-        required=True,
-        help="Path to pretrained model or model identifier from huggingface.co/models.",
-    )
-    '''
 
     parser.add_argument(
         "--load_model_path",
@@ -142,16 +133,6 @@ def parse_args(input_args=None):
         default=0.001,
         help="Initial learning rate to use.",
     )
-
-    parser.add_argument(
-        "--lr_scheduler",
-        type=str,
-        default="constant",
-        help=(
-            'The scheduler type to use. Choose between ["linear", "cosine", "cosine_with_restarts", "polynomial",'
-            ' "constant", "constant_with_warmup"]'
-        ),
-    )
     
     parser.add_argument(
         "--train_frames",
@@ -189,17 +170,6 @@ def parse_args(input_args=None):
         ),
     )
 
-    '''
-    parser.add_argument(
-        "--save_image_epochs",
-        type=int,
-        default=15,
-        help=(
-            "Dummy save image epochs!"
-        ),
-    )
-    '''
-
     parser.add_argument(
         "--val_interval",
         type=int,
@@ -225,16 +195,13 @@ def parse_args(input_args=None):
 
     return args
 
-
+# main process
 def main(args):
     start_time = time.time()
     random.seed(args.seed)
     torch.manual_seed(args.seed)
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
-    # finding mean and std
-    # ???
     
     train_trans = CustomTransform()
     valid_trans = CustomTransform(angle=0,translate=0,scale=0,shear=0,b_factor=0,c_factor=0,hflip=0)
@@ -270,7 +237,6 @@ def main(args):
         'dice_std': [],
         'dice_metric': [],
         'val_loss': [],
-        # test_loss, test_dice_mean
     }
 
     if not os.path.exists(args.output_dir):
@@ -283,10 +249,9 @@ def main(args):
     val_interval = args.val_interval
     best_metric = -1
     best_metric_epoch = -1
-    #loss_func = monai.losses.DiceLoss(sigmoid=True, weight=[0.01,1.8,1,1.3])
-    # run-5: [0.01,0.23,0.38,0.38]; run-6: [0.01,0.11,0.44,0.44]; run-7: [0.01,0.11,0.40,0.48]; 
-    # run-8,9: [0.01,0.11,0.35,0.53], run-10,11,12: [0.05,0.25,0.35,0.35]
-    loss_func = torch.nn.CrossEntropyLoss(weight=torch.tensor([0.05,0.25,0.35,0.35]).to(device)) # W
+
+    # needed to specify a weight for CE loss to prevent the background and second class from becoming dominant
+    loss_func = torch.nn.CrossEntropyLoss(weight=torch.tensor([0.05,0.25,0.35,0.35]).to(device))
     dice_metric = DiceMetric(include_background=False,reduction="mean")
 
     iter = args.num_train_epochs
@@ -334,8 +299,6 @@ def main(args):
                     loss = loss_func(y_pred, yb.float())
                     epoch_loss += loss.item()
 
-                    # may need to change this part
-                    #y_pred = torch.cat([torch.unsqueeze(post_trans(i),dim=0) for i in decollate_batch(y_pred)])
                     val_outputs = F.one_hot(torch.argmax(y_pred,dim=1), num_classes=args.num_classes).permute(0,3,1,2)
                     metric = dice_metric(val_outputs, yb)
                     dice_scores.append(metric)
