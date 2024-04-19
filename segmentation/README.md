@@ -9,4 +9,4 @@ python segmentation.py --output_dir ./results/ --image_size 256 \
 --valid_frames ./valid_frames/ --valid_masks ./valid_masks/ \
 --val_interval 2 --num_classes 4 --lr 0.001
 ```
-In this example, the folders are set based on the sample commands from the `data` section of this repository and will run the segmentation model training. One can add synthetic images to the train folders to train with augmentation schemes (like Real+100%). 
+In this example, the folders are set based on the sample commands from the `data` section of this repository and will run the segmentation model training on real data. One can add synthetic images to the train folders to train with augmentation schemes (like Real+100%). 
