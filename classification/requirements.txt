@@ -1,0 +1,4 @@
+torch>=2.2.0
+torchvision==0.16.2
+pyyaml
+scikit-learn>=1.4.0
