@@ -1,0 +1,20 @@
+model_names:
+  - resnet18
+  - resnet50
+  - vgg16
+  - vgg19
+  - efficientnet-b0
+
+data_names:
+  - "True"
+  - "SD"
+  - "DDPM"
+  - "SDM"
+  - "CN"
+
+name_to_path:
+  "True": None
+  "SD": "text_conditioned/generated"
+  "DDPM": "unconditional/generated"
+  "SDM": "data/SDM"
+  "CN": "text_seg_conditioned/generated"

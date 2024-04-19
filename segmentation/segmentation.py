@@ -15,20 +15,22 @@ from monai.networks.nets import UNet
 from monai.metrics import DiceMetric
 from copy import deepcopy
 
+
 # A class to apply random transforms on images and masks
 # Transforms include affine transformation and normalization
 class CustomTransform(object):
     def __init__(
-            self,size=256,
-            angle=10,
-            translate=0.1,
-            scale=0.1,
-            shear=10,
-            b_factor=0.3,
-            c_factor=0.3,
-            mean=0.5,
-            std=0.5,
-        ):
+        self,
+        size=256,
+        angle=10,
+        translate=0.1,
+        scale=0.1,
+        shear=10,
+        b_factor=0.3,
+        c_factor=0.3,
+        mean=0.5,
+        std=0.5,
+    ):
         self.size = size
         self.angle = angle
         self.translate = translate
@@ -43,32 +45,47 @@ class CustomTransform(object):
         image, mask = data
 
         size = self.size
-        angle = 2 * self.angle * random.random() - self.angle # angle in [-self.angle,self.angle]
+        angle = (
+            2 * self.angle * random.random() - self.angle
+        )  # angle in [-self.angle,self.angle]
         translate = (self.translate * random.random(), self.translate * random.random())
-        scale = 2 * self.scale * random.random() + 1 - self.scale # scale in [1-self.scale,1+self.scale]
-        shear = 2 * self.shear * random.random() - self.shear # shear in [-self.shear,self.shear]
-        b_factor = 2 * self.b_factor * random.random() + 1 - self.b_factor # b_factor in [1-self.b_factor,1+self.b_factor]
-        c_factor = 2 * self.c_factor * random.random() + 1 - self.c_factor # c_factor in [1-self.c_factor,1+self.c_factor]
+        scale = (
+            2 * self.scale * random.random() + 1 - self.scale
+        )  # scale in [1-self.scale,1+self.scale]
+        shear = (
+            2 * self.shear * random.random() - self.shear
+        )  # shear in [-self.shear,self.shear]
+        b_factor = (
+            2 * self.b_factor * random.random() + 1 - self.b_factor
+        )  # b_factor in [1-self.b_factor,1+self.b_factor]
+        c_factor = (
+            2 * self.c_factor * random.random() + 1 - self.c_factor
+        )  # c_factor in [1-self.c_factor,1+self.c_factor]
         mean = self.mean
         std = self.std
 
-        image = transforms.functional.resize(image, size, transforms.InterpolationMode.BILINEAR)
+        image = transforms.functional.resize(
+            image, size, transforms.InterpolationMode.BILINEAR
+        )
         image = transforms.functional.affine(image, angle, translate, scale, shear)
         image = transforms.functional.adjust_brightness(image, b_factor)
         image = transforms.functional.adjust_contrast(image, c_factor)
         image = image.float() / 255
         image = transforms.functional.normalize(image, [mean], [std])
 
-        mask = transforms.functional.resize(mask, size, transforms.InterpolationMode.NEAREST)
+        mask = transforms.functional.resize(
+            mask, size, transforms.InterpolationMode.NEAREST
+        )
         mask = transforms.functional.affine(mask, angle, translate, scale, shear)
-        mask = mask.float() / 85 # {0,85,170,255} -> {0,1,2,3}; we have 4 classes
+        mask = mask.float() / 85  # {0,85,170,255} -> {0,1,2,3}; we have 4 classes
         mask = mask.long()
 
         return image, mask
 
+
 # a dataset to handle the real (and/or synthetic) data
 class SegDataset(Dataset):
-    def __init__(self, image_dir, mask_dir, transform=None, device='cpu'):
+    def __init__(self, image_dir, mask_dir, transform=None, device="cpu"):
         self.image_dir = image_dir
         self.mask_dir = mask_dir
         self.frames = sorted(os.listdir(image_dir))
@@ -88,6 +105,7 @@ class SegDataset(Dataset):
 
         return image, mask
 
+
 # Input arguments
 def parse_args(input_args=None):
     parser = argparse.ArgumentParser(description="This is our segmentation script.")
@@ -96,9 +114,9 @@ def parse_args(input_args=None):
         "--load_model_path",
         type=str,
         default=None,
-        help="The path to load the model from."
+        help="The path to load the model from.",
     )
-    
+
     parser.add_argument(
         "--output_dir",
         type=str,
@@ -106,7 +124,9 @@ def parse_args(input_args=None):
         help="The output directory where the model predictions and checkpoints will be written.",
     )
 
-    parser.add_argument("--seed", type=int, default=0, help="A seed for reproducible training.")
+    parser.add_argument(
+        "--seed", type=int, default=0, help="A seed for reproducible training."
+    )
 
     parser.add_argument(
         "--image_size",
@@ -118,76 +138,70 @@ def parse_args(input_args=None):
     )
 
     parser.add_argument(
-        "--train_batch_size", type=int, default=16, help="Batch size for the training dataloader."
+        "--train_batch_size",
+        type=int,
+        default=16,
+        help="Batch size for the training dataloader.",
     )
 
     parser.add_argument("--num_train_epochs", type=int, default=300)
 
     parser.add_argument(
-        "--valid_batch_size", type=int, default=8, help="Batch size for the validation dataloader."
+        "--valid_batch_size",
+        type=int,
+        default=8,
+        help="Batch size for the validation dataloader.",
     )
-    
+
     parser.add_argument(
         "--lr",
         type=float,
         default=0.001,
         help="Initial learning rate to use.",
     )
-    
+
     parser.add_argument(
         "--train_frames",
         type=str,
-        default='./data-echo-pat/train-frames-efn/',
-        help=(
-            "Train frames directory."
-        ),
+        default="./data-echo-pat/train-frames-efn/",
+        help=("Train frames directory."),
     )
 
     parser.add_argument(
         "--train_masks",
         type=str,
-        default='./data-echo-pat/train-masks-efn/',
-        help=(
-            "Train masks directory."
-        ),
+        default="./data-echo-pat/train-masks-efn/",
+        help=("Train masks directory."),
     )
 
     parser.add_argument(
         "--valid_frames",
         type=str,
-        default='./data-echo-pat/valid-frames-efn/',
-        help=(
-            "Valid frames directory."
-        ),
+        default="./data-echo-pat/valid-frames-efn/",
+        help=("Valid frames directory."),
     )
 
     parser.add_argument(
         "--valid_masks",
         type=str,
-        default='./data-echo-pat/valid-masks-efn/',
-        help=(
-            "Valid masks directory."
-        ),
+        default="./data-echo-pat/valid-masks-efn/",
+        help=("Valid masks directory."),
     )
 
     parser.add_argument(
         "--val_interval",
         type=int,
         default=5,
-        help=(
-            "validation period!"
-        ),
+        help=("validation period!"),
     )
 
     parser.add_argument(
         "--num_classes",
         type=int,
         default=4,
-        help=(
-            "Number of semantic classes!"
-        ),
+        help=("Number of semantic classes!"),
     )
-    
+
     if input_args is not None:
         args = parser.parse_args(input_args)
     else:
@@ -195,54 +209,62 @@ def parse_args(input_args=None):
 
     return args
 
+
 # main process
 def main(args):
     start_time = time.time()
     random.seed(args.seed)
     torch.manual_seed(args.seed)
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
     train_trans = CustomTransform()
-    valid_trans = CustomTransform(angle=0,translate=0,scale=0,shear=0,b_factor=0,c_factor=0,hflip=0)
+    valid_trans = CustomTransform(
+        angle=0, translate=0, scale=0, shear=0, b_factor=0, c_factor=0, hflip=0
+    )
 
     train_ds = SegDataset(args.train_frames, args.train_masks, transform=train_trans)
     valid_ds = SegDataset(args.valid_frames, args.valid_masks, transform=valid_trans)
 
-    train_dl = DataLoader(train_ds, batch_size=args.train_batch_size, pin_memory=torch.cuda.is_available())
-    valid_dl = DataLoader(valid_ds, batch_size=args.valid_batch_size, pin_memory=torch.cuda.is_available())
+    train_dl = DataLoader(
+        train_ds, batch_size=args.train_batch_size, pin_memory=torch.cuda.is_available()
+    )
+    valid_dl = DataLoader(
+        valid_ds, batch_size=args.valid_batch_size, pin_memory=torch.cuda.is_available()
+    )
 
     model = UNet(
         spatial_dims=2,
         in_channels=1,
-        out_channels=args.num_classes, # number of labels including background
+        out_channels=args.num_classes,  # number of labels including background
         channels=(2, 4, 8, 16, 32, 64, 128, 256),
         strides=(2, 2, 2, 2, 2, 2, 2),
         num_res_units=0,
-        act=('LeakyReLU', {'negative_slope': 0.1, 'inplace': True}),
+        act=("LeakyReLU", {"negative_slope": 0.1, "inplace": True}),
     ).to(device)
 
-    
     if args.load_model_path:
         model.load_state_dict(torch.load(args.load_model_path))
-        print('Model loaded from {}'.format(args.load_model_path))
-    
+        print("Model loaded from {}".format(args.load_model_path))
+
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
-    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer,T_max=args.num_train_epochs,eta_min=0.0001)
+    scheduler = optim.lr_scheduler.CosineAnnealingLR(
+        optimizer, T_max=args.num_train_epochs, eta_min=0.0001
+    )
 
     logs = {
-        'epoch': [],
-        'loss': [],
-        'dice_mean': [],
-        'dice_std': [],
-        'dice_metric': [],
-        'val_loss': [],
+        "epoch": [],
+        "loss": [],
+        "dice_mean": [],
+        "dice_std": [],
+        "dice_metric": [],
+        "val_loss": [],
     }
 
     if not os.path.exists(args.output_dir):
         os.mkdir(args.output_dir)
-    
-    with open(args.output_dir + 'args.pkl','wb') as f:
+
+    with open(args.output_dir + "args.pkl", "wb") as f:
         pickle.dump(args, f)
 
     # -------------------------------------------------
@@ -251,8 +273,10 @@ def main(args):
     best_metric_epoch = -1
 
     # needed to specify a weight for CE loss to prevent the background and second class from becoming dominant
-    loss_func = torch.nn.CrossEntropyLoss(weight=torch.tensor([0.05,0.25,0.35,0.35]).to(device))
-    dice_metric = DiceMetric(include_background=False,reduction="mean")
+    loss_func = torch.nn.CrossEntropyLoss(
+        weight=torch.tensor([0.05, 0.25, 0.35, 0.35]).to(device)
+    )
+    dice_metric = DiceMetric(include_background=False, reduction="mean")
 
     iter = args.num_train_epochs
     for ep in range(iter):
@@ -283,8 +307,8 @@ def main(args):
         print(f"epoch {ep + 1} average loss: {epoch_loss:.4f}")
 
         if (ep + 1) % val_interval == 0:
-            logs['loss'].append(epoch_loss)
-            logs['epoch'].append(ep + 1)
+            logs["loss"].append(epoch_loss)
+            logs["epoch"].append(ep + 1)
             model.eval()
             with torch.no_grad():
                 step = 0
@@ -293,44 +317,59 @@ def main(args):
                     step += 1
 
                     xb, yb = batch[0].to(device), batch[1].to(device)
-                    yb = F.one_hot(yb.long(), args.num_classes).squeeze().permute(0, 3, 1, 2)
+                    yb = (
+                        F.one_hot(yb.long(), args.num_classes)
+                        .squeeze()
+                        .permute(0, 3, 1, 2)
+                    )
 
                     y_pred = model(xb)
                     loss = loss_func(y_pred, yb.float())
                     epoch_loss += loss.item()
 
-                    val_outputs = F.one_hot(torch.argmax(y_pred,dim=1), num_classes=args.num_classes).permute(0,3,1,2)
+                    val_outputs = F.one_hot(
+                        torch.argmax(y_pred, dim=1), num_classes=args.num_classes
+                    ).permute(0, 3, 1, 2)
                     metric = dice_metric(val_outputs, yb)
                     dice_scores.append(metric)
 
                 epoch_loss /= step
-                logs['val_loss'].append(epoch_loss)
+                logs["val_loss"].append(epoch_loss)
 
                 dice_scores = torch.cat(dice_scores, dim=0)
-                s = tuple(torch.std(dice_scores,dim=0).cpu().numpy())
-                m = tuple(torch.mean(dice_scores,dim=0).cpu().numpy())
-                logs['dice_mean'].append(m)
-                logs['dice_std'].append(s)
+                s = tuple(torch.std(dice_scores, dim=0).cpu().numpy())
+                m = tuple(torch.mean(dice_scores, dim=0).cpu().numpy())
+                logs["dice_mean"].append(m)
+                logs["dice_std"].append(s)
                 epoch_metric = torch.mean(dice_scores).item()
-                logs['dice_metric'].append(epoch_metric)
+                logs["dice_metric"].append(epoch_metric)
 
                 if epoch_metric > best_metric:
                     best_metric = epoch_metric
                     best_metric_epoch = ep + 1
-                    torch.save(model.state_dict(), args.output_dir + f"best_metric_model_segmentation2d.pth")
+                    torch.save(
+                        model.state_dict(),
+                        args.output_dir + f"best_metric_model_segmentation2d.pth",
+                    )
                     print("saved new best metric model")
 
-                print("current epoch: {} current dice loss: {:.4f} current mean dice: {:.4f} best mean dice: {:.4f} at epoch {}".format(
-                            ep + 1, epoch_loss, epoch_metric, best_metric, best_metric_epoch))
+                print(
+                    "current epoch: {} current dice loss: {:.4f} current mean dice: {:.4f} best mean dice: {:.4f} at epoch {}".format(
+                        ep + 1, epoch_loss, epoch_metric, best_metric, best_metric_epoch
+                    )
+                )
                 print(f"class mean dice: {m} class std dice: {s}")
 
-                with open(args.output_dir + "logs.pkl", 'wb') as f:
+                with open(args.output_dir + "logs.pkl", "wb") as f:
                     pickle.dump(logs, f)
     end_time = time.time()
-    print(f"train completed, best_metric: {best_metric:.4f} at epoch: {best_metric_epoch}")
-    print("Elapsed time: {:.2f} mins.".format((end_time-start_time)/60))
+    print(
+        f"train completed, best_metric: {best_metric:.4f} at epoch: {best_metric_epoch}"
+    )
+    print("Elapsed time: {:.2f} mins.".format((end_time - start_time) / 60))
     return
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     args = parse_args()
     main(args)
