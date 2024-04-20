@@ -8,11 +8,6 @@ This part of the repository contains a deep learning project for image classific
 - Configuration via YAML for easy swapping of models and datasets.
 - Automated training and validation processes with metrics tracking.
 
-## Installation
-You'll need Python 3.6 or later to run this project. All dependencies are listed in `requirements.txt`.
-```bash
-pip install requirements.txt
-```
 
 ## Configuration
 Edit the `config_training.yaml` file to set your preferred models, datasets, and paths.

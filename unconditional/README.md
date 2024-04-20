@@ -1,9 +1,4 @@
 # Unconditional Generation Task
-## Installation
-Install the required dependencies by running the following command:
-```bash
-pip install -r requirements.txt
-```
 
 ## Unconditional Model Training
 To train the unconditional model, navigate to the unconditional directory and execute the following command:
