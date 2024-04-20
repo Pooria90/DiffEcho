@@ -1,0 +1,11 @@
+git+https://github.com/huggingface/diffusers.git
+datasets>=2.15.0
+Pillow>=8.1.0
+accelerate>=0.16.0
+torchvision>=0.14.1
+transformers>=4.25.1
+ftfy
+tensorboard
+Jinja2
+peft==0.7.0
+torchmetrics[image]

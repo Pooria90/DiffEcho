@@ -333,11 +333,11 @@ def evaluate_model(model, loader, device):
 
     return metrics
 
+
 def load_config(config_path):
-    with open(config_path, 'r') as file:
+    with open(config_path, "r") as file:
         config = yaml.safe_load(file)
     return config
-
 
 
 def main():
@@ -350,9 +350,9 @@ def main():
             transforms.ToTensor(),
         ]
     )
-    model_names = config['model_names']
-    data_names = config['data_names']
-    name_to_path = config['name_to_path']
+    model_names = config["model_names"]
+    data_names = config["data_names"]
+    name_to_path = config["name_to_path"]
     included_folders = ["class_ch2_ed", "class_ch2_es", "class_ch4_ed", "class_ch4_es"]
 
     for model_name in model_names:
