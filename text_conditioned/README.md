@@ -6,7 +6,7 @@ This section details the fine-tuning of the model using textual prompts. We util
 First, prepare a dataset suitable for this project by creating a `metadata_stable_diffusion.csv` file. To do this, follow these steps:
 ```bash
 cd data
-python meta_data_generator_stable_diffusion.py
+python meta_data_generator_stable_diffusion.py --do_random_string
 ```
 * Note: you can add --do_random_string flag in this part to produce random text(that model has never see)
 
